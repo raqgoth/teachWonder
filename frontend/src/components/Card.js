@@ -2,6 +2,7 @@ import React,{ useEffect, useState } from "react";
 
 import Moment from 'moment';
 import CommentsService from "../services/CommentsService";
+import PostService from "../services/PostService";
 
 
 
@@ -31,6 +32,12 @@ const Card = (props) => {
             window.location="/";
         })
     }
+    const deletePost = ()=>{
+        PostService.delete(props.id).then(res=>{
+            alert(res.data.message);
+            window.location="/";
+        })
+    }
 
     return (
         <div className="card mb-2">
@@ -46,7 +53,7 @@ const Card = (props) => {
                 </div>
                 <div className="col-sm-4 p-2 text-right">
                     <a href={ `/editpost/${props.id}` } type="button" className="btn btn-primary btn-sm mr-2">Edit</a>
-                    <button type="button" className="btn btn-danger btn-sm" >Delete</button>
+                    <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ deletePost() }}>Delete</button>
                 </div>
             </div>
             <h5 className="card-title p-2">{props.title}</h5>

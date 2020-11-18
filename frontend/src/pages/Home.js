@@ -39,12 +39,5 @@ const Home = () => {
     );
 }
 
-/*
-const deletePost = (postId)=>{
-    PostService.delete(postId).then(res=>{
-        console.log(res.data.message);
-    });
-}*/
-
 export default Home;
 

@@ -34,23 +34,26 @@ const EditPost = (props) => {
     useEffect(() => {
         PostService.getById(params.postId) 
         .then(res=>{
-            console.log(res.data);
-            setPost(res.data);            
+            setPost({
+                title:res.data.title,
+                content:res.data.content,
+                author:res.data.author,
+            });            
         });
 
      }, []);
 
     const onSubmit = values=>{
-       /* const {title,content,author} = values;
+       const {title,content,author} = values;
         setLoading(true);
-        PostService.create({title,content,author})
+        PostService.update(params.postId,{title,content,author})
         .then(res=>{
             setLoading(false);
             setMessage(res.data.message);
             setInterval(function(){ 
                 history.push('/');
             },2000);
-        });*/
+        });
     }
 
     return (
@@ -62,15 +65,16 @@ const EditPost = (props) => {
                         { message!==''? (<div className="alert alert-success" >{message}</div>) :''}
                         <h3>Edit post</h3>
                         <Form
+                        initialValues={post}
                         validate={validators}
                         onSubmit={onSubmit}
                         render={(formProps) =>(
                             <div>
-                                <CustomField name="title" inputType="text" label="Title"   placeholder="Title..."  onChange={post.title} />
+                                <CustomField name="title"   inputType="text" label="Title"   placeholder="Title..."  />
                                 <CustomField name="content" inputType="textarea" label="Content"   placeholder="Content..." />
                                 <CustomField name="author" inputType="text" label="Author"   placeholder="Author..." />
                                 <button type="submit" className="btn btn-success" onClick={formProps.handleSubmit} disabled={loading}>
-                                    {loading ? ('Creating post...'): ('Create')}
+                                    {loading ? ('Updating post...'): ('Update')}
                                 </button>
                             </div>
                             
