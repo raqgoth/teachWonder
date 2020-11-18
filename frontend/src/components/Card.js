@@ -1,13 +1,35 @@
 import React,{ useEffect, useState } from "react";
 
-const Card = () => {
-    const [comment,setComment] = useState(false);
+import Moment from 'moment';
+import CommentsService from "../services/CommentsService";
+
+
+
+const Card = (props) => {
+    const [add,setAdd] = useState(false);
+    const [comments,setComments] = useState([]);
+    const [mycomment,setMycomment] = useState('');
+
+    Moment.locale('en');
 
     useEffect(()=>{
-    });
+        CommentsService.getByPostId(props.id)
+        .then(res=>{
+            setComments(res.data);
+        })
 
-    const sendComment = ()=>{
-        alert('funciona!');
+     }, []) ;
+
+     const sendComment = ()=>{
+        const obj = {
+            comment:mycomment,
+            author:'Anonymous',
+            postId:props.id
+        };
+        CommentsService.create(obj).then(res=>{
+            alert(res.data.message);
+            window.location="/";
+        })
     }
 
     return (
@@ -18,40 +40,62 @@ const Card = () => {
                         <span className="material-icons avatar-icon">account_circle</span>
                    </div>
                    <div className="col-sm-8">
-                        <span>Username</span><br/>
-                        <span>YYYY-MM-DD</span>
+                        <span>{props.author}</span><br/>
+                        <span>{ Moment(props.date).format('d MMM YYYY') }</span>
                    </div>
                 </div>
                 <div className="col-sm-4 p-2 text-right">
-                    <button type="button" className="btn btn-primary btn-sm mr-2">Edit</button>
-                    <button type="button" className="btn btn-danger btn-sm">Delete</button>
+                    <a href={ `/editpost/${props.id}` } type="button" className="btn btn-primary btn-sm mr-2">Edit</a>
+                    <button type="button" className="btn btn-danger btn-sm" >Delete</button>
                 </div>
             </div>
-            <h5 className="card-title p-2">Card title</h5>
-            <p className="card-text p-2">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <h5 className="card-title p-2">{props.title}</h5>
+            <p className="card-text p-2 text-justify">{props.content}</p>
             <div className="text-right p-2">
-              { comment==false? (
-                  <button type="button" className="btn btn-success btn-sm" onClick={()=>{ setComment(true); }} >add comment</button>
+              { add===false? (
+                  <button type="button" className="btn btn-success btn-sm" onClick={()=>{ setAdd(true); }} >add comment</button>
               ):(
-                <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ setComment(false); }} >cancel comment</button>
+                <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ setAdd(false); }} >cancel comment</button>
               ) }
             </div>
             <div className="card">
-                {comment? (
+                {add? (
                     <div className="p-2" >
                         <div className="input-group">
-                            <input type="text" className="form-control" placeholder="Recipient's username" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" />
+                            <input type="text" onChange={(event)=>setMycomment(event.target.value)} className="form-control" placeholder="Write your comments..." />
                             <div className="input-group-append" id="button-addon4">
-                                <button className="btn btn-success" type="button" onClick={()=>{ sendComment(); }}   >send</button>
+                                <button className="btn btn-success" type="button" onClick={()=>{ sendComment(); }}>send</button>
                             </div>
                         </div>
                     </div>
                 ) : ('')}
                 <ul className="list-group list-group-flush">
-                    <li className="list-group-item">Cras justo odio</li>
-                    <li className="list-group-item">Dapibus ac facilisis in</li>
-                    <li className="list-group-item">Vestibulum at eros</li>
-                    <li className="list-group-item text-center"><button type="button" className="btn btn-info btn-sm">view more...</button></li>
+                    { props.limitComments === true?
+                        
+                            comments.map((item, index) => 
+                            index<3?
+                            (<li className="list-group-item" key={index}>
+                                                <span>{item.comment}</span><br/>
+                                                <span>{item.author}</span><br/>
+                                                <span>{ Moment(item.updatedAt).format('d MMM YYYY') }</span>
+                                                </li>) : ('') )
+                        :
+                        comments.map((item, index) => 
+                           (<li className="list-group-item" key={index}>
+                                            <span>{item.comment}</span><br/>
+                                            <span>{item.author}</span><br/>
+                                            <span>{ Moment(item.updatedAt).format('d MMM YYYY') }</span>
+                                            </li>) 
+                        )
+                    }     
+                    <li className="list-group-item text-center">
+                        {
+                            props.limitComments===true?
+                            (<a href={`/viewmore/${props.id}`} className="btn btn-info btn-sm">view more...</a>)
+                            :(<a href="/" className="btn btn-primary btn-sm"> Back</a>)
+                        }
+                        
+                    </li>
                 </ul>
             </div>
             

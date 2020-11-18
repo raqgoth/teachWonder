@@ -38,3 +38,9 @@ npm install react-router-dom --save
 
 HTTP
 npm install axios
+
+MOMENT
+npm install moment --save
+
+FINAL FORM
+npm install --save final-form react-final-form
